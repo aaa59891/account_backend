@@ -1,0 +1,12 @@
+[database]
+    driveName = "mysql"
+    host = "localhost"
+    port = 5400
+    account = ""
+    password = ""
+    databaseName = ""
+
+[server]
+    port = ":8080"
+    staticPath = "./"
+    staticUriRoot = "./"
