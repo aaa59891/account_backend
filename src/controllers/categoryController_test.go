@@ -1,8 +1,11 @@
 package controllers_test
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/jinzhu/gorm"
 
 	"github.com/aaa59891/account_backend/src/db"
 
@@ -11,13 +14,15 @@ import (
 	"github.com/aaa59891/account_backend/src/models"
 )
 
+var defaultCategory = models.Category{Email: "chong@email.com", Name: "category name"}
+
 func TestCreateCategory(t *testing.T) {
 	tm := []testModel{
 		{
 			"create category",
 			http.StatusOK,
 			"",
-			models.Category{Email: "chong@email.com", Name: "category name"},
+			defaultCategory,
 		},
 		{
 			"create category with empty email",
@@ -53,7 +58,7 @@ func TestCreateCategory(t *testing.T) {
 }
 
 func TestUpdateCategory(t *testing.T) {
-	category := models.Category{Email: "test@test.com", Name: "testname"}
+	category := defaultCategory
 	if err := db.DB.Create(&category).Error; err != nil {
 		t.Fatalf("could not create category: %v", err)
 	}
@@ -81,4 +86,29 @@ func TestUpdateCategory(t *testing.T) {
 	}
 
 	DeleteModel(&models.Category{}, category.Id, "id", t)
+}
+
+func TestDeleteCategory(t *testing.T) {
+	category := defaultCategory
+
+	if err := db.DB.Create(&category).Error; err != nil {
+		t.Fatalf("could not create category: %v", err)
+	}
+
+	tm := []testModel{
+		{"delete a category", http.StatusOK, "", category},
+	}
+
+	for _, tc := range tm {
+		t.Run(tc.name, func(tt *testing.T) {
+			c := tc.model.(models.Category)
+
+			th := GetTestHelper(tt).SetRequest(http.MethodDelete, fmt.Sprintf("%s/%s/%d", urlPrefix, "category", c.Id), nil).SendRequest(router)
+			assert.Equal(tt, th.Response.Code, tc.status)
+
+			dbCategory := models.Category{}
+			err := db.DB.Find(&dbCategory, "id = ?", c.Id).Error
+			assert.Equal(tt, err, gorm.ErrRecordNotFound)
+		})
+	}
 }
