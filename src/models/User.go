@@ -19,10 +19,11 @@ import (
 var (
 	ErrNoEmail       = errors.New("this email does not exist")
 	ErrWrongPassword = errors.New("wrong password")
+	ErrEmailExist    = errors.New("this email already existed")
 )
 
 type User struct {
-	ID        uint   `gorm:"primary_key"`
+	Id        uint   `gorm:"primary_key"`
 	Email     string `gorm:"type:varchar(100);unique_index;not null" binding:"required"`
 	Password  string `gorm:"not null;" binding:"required"`
 	CreatedAt time.Time
@@ -35,7 +36,13 @@ func (u *User) Insert(tx *gorm.DB) error {
 	if err := u.encryptPassword(); err != nil {
 		return err
 	}
-	return tx.Create(u).Error
+	if err := tx.Create(u).Error; err != nil {
+		if strings.Contains(err.Error(), "Duplicate") {
+			return ErrEmailExist
+		}
+		return err
+	}
+	return nil
 }
 
 func (u *User) Update(tx *gorm.DB) error {

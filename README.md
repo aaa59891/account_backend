@@ -60,7 +60,7 @@ Three run commands in different env:
 
 * Testing: 
 ```
-$ GO_ENV=test go test -v -cover ./controllers/
+$ GO_ENV=test go test -v -cover ./src/controllers/
 ```
 * Stage env:
 ```
