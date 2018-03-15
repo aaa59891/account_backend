@@ -18,4 +18,5 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/signin", controllers.SignIn)
 
 	r.POST("/category", controllers.CreateCategory)
+	r.PUT("/category", controllers.UpdateCategory)
 }

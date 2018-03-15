@@ -8,13 +8,16 @@ import (
 
 type Category struct {
 	Id        uint   `gorm:"primary_key"`
-	Email     string `gorm:"type:varchar(100);not null" binding:"required"`
+	Email     string `gorm:"type:varchar(100);not null"`
 	Name      string `gorm:"not null;"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
 func (category *Category) Insert(tx *gorm.DB) error {
+	if len(category.Email) == 0 {
+		return ErrNoEmail
+	}
 	return tx.Create(category).Error
 }
 
