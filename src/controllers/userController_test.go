@@ -48,3 +48,37 @@ func TestSingUp(t *testing.T) {
 
 	DeleteModel(&existUser, existUser.Id, "id", t)
 }
+
+func TestSingIn(t *testing.T) {
+
+	user := models.User{Email: "chong@test.com", Password: "testPassword"}
+
+	signUp := GetJsonBody(user)
+
+	signUpTh := GetTestHelper(t).SetRequest(http.MethodPost, urlPrefix+"/user", signUp).SendRequest(router)
+
+	if len(signUpTh.Errs) > 0 {
+		t.Fatalf("could not sign up: %v", signUpTh.Errs)
+	}
+	tm := []testModel{
+		{"test sign in", http.StatusOK, "", user},
+		{"test sign in with wrong password", http.StatusBadRequest, models.ErrWrongPassword.Error(), models.User{Email: user.Email, Password: "wrongPassword"}},
+	}
+
+	for _, tc := range tm {
+		t.Run(tc.name, func(tt *testing.T) {
+			u := tc.model.(models.User)
+			signInBuf := GetJsonBody(u)
+			signInTh := GetTestHelper(tt).SetRequest(http.MethodPost, urlPrefix+"/signin", signInBuf).SendRequest(router)
+
+			assert.Equal(tt, signInTh.Response.Code, tc.status)
+
+			if len(tc.err) > 0 {
+				signInTh.DecodeErrResponseBody()
+				assert.Equal(tt, signInTh.ResponseErrBody.Message, tc.err)
+				return
+			}
+		})
+	}
+	DeleteModel(&models.User{}, user.Email, "email", t)
+}
