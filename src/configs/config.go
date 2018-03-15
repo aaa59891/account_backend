@@ -11,6 +11,7 @@ import (
 type config struct {
 	Server   server
 	Database database
+	Security security
 }
 
 type server struct {
@@ -24,6 +25,10 @@ type database struct {
 	Host         string
 	Port         int
 	DatabaseName string
+}
+
+type security struct {
+	BcryptCost int
 }
 
 var c *config = &config{}
