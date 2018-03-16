@@ -16,7 +16,7 @@ type Record struct {
 	Email      string `gorm:"type:varchar(100);not null;index;"`
 	Amount     int
 	CategoryId uint
-	Date       time.Time `gorm:"type:date();index"`
+	Date       time.Time `gorm:"type:date;index"`
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }

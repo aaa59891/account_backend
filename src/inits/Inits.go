@@ -9,6 +9,7 @@ func CreateTable() {
 	modelArr := make([]interface{}, 0)
 	modelArr = append(modelArr, models.User{})
 	modelArr = append(modelArr, models.Category{})
+	modelArr = append(modelArr, models.Record{})
 
 	for _, model := range modelArr {
 		db.DB.Set("gorm:table_options", "CHARACTER SET = utf8").AutoMigrate(model)
