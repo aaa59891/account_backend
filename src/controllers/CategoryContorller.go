@@ -24,7 +24,9 @@ func CreateCategory(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, gin.H{
+		"data": category,
+	})
 }
 
 func UpdateCategory(c *gin.Context) {
@@ -54,4 +56,17 @@ func DeleteCategory(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, nil)
+}
+
+func FetchCategories(c *gin.Context) {
+	email := c.Param("email")
+
+	categories, err := models.GetCategoriesByEmail(email)
+	if err != nil {
+		GoToErrorResponse(http.StatusInternalServerError, c, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": categories,
+	})
 }

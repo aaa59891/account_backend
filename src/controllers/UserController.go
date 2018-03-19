@@ -32,7 +32,7 @@ func SignIn(c *gin.Context) {
 	}
 	if err := user.CheckPassword(); err != nil {
 		status := http.StatusInternalServerError
-		if err == models.ErrWrongPassword {
+		if err == models.ErrWrongPassword || err == models.ErrNoEmail {
 			status = http.StatusBadRequest
 		}
 		GoToErrorResponse(status, c, err)

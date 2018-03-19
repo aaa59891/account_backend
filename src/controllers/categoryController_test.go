@@ -112,3 +112,61 @@ func TestDeleteCategory(t *testing.T) {
 		})
 	}
 }
+
+func TestFetchCategories(t *testing.T) {
+	categories := []models.Category{
+		{Email: defaultCategory.Email, Name: "test1"},
+		{Email: defaultCategory.Email, Name: "test2"},
+		{Email: defaultCategory.Email, Name: "test3"},
+	}
+	if err := models.Transactional(func(tx *gorm.DB) error {
+		for _, category := range categories {
+			if err := tx.Create(&category).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		t.Fatalf("could not create category: %v", err)
+	}
+
+	tm := []testModel{
+		{
+			"fetch categories",
+			http.StatusOK,
+			"",
+			defaultCategory.Email,
+		},
+	}
+
+	for _, tc := range tm {
+		t.Run(tc.name, func(tt *testing.T) {
+			email := tc.model.(string)
+			th := GetTestHelper(tt).SetRequest(http.MethodGet, urlPrefix+"/category/"+email, nil).SendRequest(router)
+
+			assert.Equal(tt, th.Response.Code, tc.status)
+
+			if len(tc.err) > 0 {
+				th.DecodeErrResponseBody()
+				assert.Equal(tt, th.ResponseErrBody.Message, tc.err)
+				return
+			}
+			body := struct {
+				Data []models.Category
+			}{}
+			th.DecodeResponseBody(&body)
+			assert.Equal(tt, len(body.Data), len(categories))
+		})
+	}
+	if err := models.Transactional(func(tx *gorm.DB) error {
+		for _, category := range categories {
+			if err := tx.Delete(category).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		t.Fatalf("could not delete category: %v", err)
+	}
+
+}

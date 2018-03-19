@@ -20,6 +20,7 @@ func SetRoutes(r *gin.Engine) {
 	r.POST("/category", controllers.CreateCategory)
 	r.PUT("/category", controllers.UpdateCategory)
 	r.DELETE("/category/:id", controllers.DeleteCategory)
+	r.GET("/category/:email", controllers.FetchCategories)
 
 	r.POST("/record", controllers.CreateRecord)
 }
