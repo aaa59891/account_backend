@@ -27,3 +27,20 @@ func CreateRecord(c *gin.Context) {
 		"data": record,
 	})
 }
+
+func FetchRecords(c *gin.Context) {
+	rf := models.RecordForm{}
+	if err := c.ShouldBindQuery(&rf); err != nil {
+		GoToErrorResponse(http.StatusBadRequest, c, err)
+		return
+	}
+
+	data, err := rf.GetRecords()
+	if err != nil {
+		GoToErrorResponse(http.StatusInternalServerError, c, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
+}

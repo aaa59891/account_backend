@@ -23,4 +23,5 @@ func SetRoutes(r *gin.Engine) {
 	r.GET("/category/:email", controllers.FetchCategories)
 
 	r.POST("/record", controllers.CreateRecord)
+	r.GET("/record", controllers.FetchRecords)
 }

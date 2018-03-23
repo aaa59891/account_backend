@@ -22,7 +22,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	if os.Getenv("GO_ENV") == "dev" {
+	if os.Getenv("GO_ENV") == "dev" || os.Getenv("GO_ENV") == "test" {
 		DB.LogMode(true)
 	}
 
